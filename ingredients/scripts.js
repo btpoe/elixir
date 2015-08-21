@@ -1,4 +1,4 @@
-var elixir = require('laravel-elixir');
+var elixir = require('btpoe-elixir');
 var combine = require('./commands/MergeFiles.js');
 var MergeRequest = require('./commands/MergeRequest');
 

@@ -1,4 +1,4 @@
-var elixir   = require('laravel-elixir');
+var elixir   = require('btpoe-elixir');
 var runTests = require('./commands/RunTests');
 var _        = require('underscore');
 

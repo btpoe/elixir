@@ -1,5 +1,5 @@
 var gulp         = require('gulp');
-var elixir       = require('laravel-elixir');
+var elixir       = require('btpoe-elixir');
 var config       = elixir.config;
 var merge        = require('merge-stream');
 var plugins      = require('gulp-load-plugins')();

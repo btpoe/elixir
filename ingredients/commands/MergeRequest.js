@@ -1,5 +1,5 @@
 var utilities = require('./Utilities');
-var config    = require('laravel-elixir').config;
+var config    = require('btpoe-elixir').config;
 
 var MergeRequest = function(files, baseDir, outputDir, ext) {
     var output = utilities.parse(outputDir);

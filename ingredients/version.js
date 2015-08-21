@@ -1,5 +1,5 @@
 var gulp       = require('gulp');
-var elixir     = require('laravel-elixir');
+var elixir     = require('btpoe-elixir');
 var utilities  = require('./commands/Utilities');
 var parsePath  = require('parse-filepath');
 var vinylPaths = require('vinyl-paths');

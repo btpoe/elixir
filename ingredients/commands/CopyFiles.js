@@ -3,7 +3,7 @@ var gulpif    = require('gulp-if');
 var utilities = require('./Utilities');
 var rename    = require('gulp-rename');
 var merge     = require('merge-stream');
-var config    = require('laravel-elixir').config;
+var config    = require('btpoe-elixir').config;
 
 
 /**

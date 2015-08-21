@@ -1,6 +1,6 @@
 var gulp   = require('gulp');
 var copy   = require('./commands/CopyFiles');
-var elixir = require('laravel-elixir');
+var elixir = require('btpoe-elixir');
 var config = elixir.config;
 
 /*

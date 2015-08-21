@@ -1,7 +1,7 @@
 var gulp         = require('gulp');
 var Notification = require('./Notification');
 var plugins      = require('gulp-load-plugins')();
-var config       = require('laravel-elixir').config;
+var config       = require('btpoe-elixir').config;
 
 
 /**
