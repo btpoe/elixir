@@ -27,7 +27,7 @@ var getDestination = function(output) {
     return {
         fileName: parsed.name || 'bundle.js',
         dir: parsed.baseDir
-    }
+    };
 };
 
 
@@ -37,8 +37,13 @@ var getDestination = function(output) {
  * @param {string|array} src
  * @param {object}       options
  */
-var browserifyStream = function(src, options) {
-    return browserify(src, options);
+var browserifyStream = function(data) {
+    var stream = browserify(data.src, data.options);
+
+    stream.transform(babelify, { stage: 0 });
+    stream.transform(partialify);
+
+    return stream;
 };
 
 
@@ -48,12 +53,12 @@ var browserifyStream = function(src, options) {
  * @param {string|array} src
  * @param {object}       options
  */
-var watchifyStream = function(src, options) {
-    var browserify = watchify(browserifyStream(src, options));
+var watchifyStream = function(data) {
+    var browserify = watchify(browserifyStream(data));
 
     browserify.on('log', gutil.log);
     browserify.on('update', function() {
-        bundle(browserify);
+        bundle(browserify, data);
     });
 
     return browserify;
@@ -71,12 +76,9 @@ var buildTask = function() {
             : browserifyStream;
 
         return merge.apply(this, dataSet.map(function(data) {
-            utilities.logTask('Running Browserify', data.src);
-
-            bundle = function(stream) {
+            bundle = function(stream, data) {
+                utilities.logTask('Running Browserify', data.src);
                 return stream
-                    .transform(babelify, { stage: 0 })
-                    .transform(partialify)
                     .bundle()
                     .on('error', function(e) {
                         new Notification().error(e, 'Browserify Failed!');
@@ -86,9 +88,9 @@ var buildTask = function() {
                     .pipe(buffer())
                     .pipe(gulpIf(elixir.config.production, uglify()))
                     .pipe(gulp.dest(data.destination.dir));
-            }
+            };
 
-            return bundle(stream(data.src, data.options));
+            return bundle(stream(data), data);
         }));
     });
 };
