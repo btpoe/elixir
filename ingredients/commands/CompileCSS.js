@@ -1,10 +1,10 @@
-var gulp = require('gulp');
-var config = require('laravel-elixir').config;
+var gulp         = require('gulp');
+var config       = require('laravel-elixir').config;
+var plugins      = require('gulp-load-plugins')();
+var utilities    = require('./Utilities');
+var merge        = require('merge-stream');
+var browserSync  = require('browser-sync');
 var Notification = require('./Notification');
-var plugins = require('gulp-load-plugins')();
-var utilities = require('./Utilities');
-var merge = require('merge-stream');
-var browserSync = require('browser-sync');
 
 /**
  * Trigger preprocessor compilation.
@@ -48,21 +48,14 @@ var triggerCompiler = function(src, options) {
  */
 var buildTask = function(name, watchPath) {
     gulp.task(name, function() {
-        var dataSet = config.collections['compile'+name];
-        return merge.apply(this, dataSet.map(function(data) {
-        //return merge.apply(this, config.compile[name].map(function(data) {
-            var src = data.src;
-            var options = data.options;
+        return merge.apply(this, config.collections['compile' + name].map(function(data) {
 
+            var options = data.options;
 
             utilities.logTask("Running " + options.compiler, data.src);
 
-            //return triggerCompiler(data.src, options)
-            return triggerCompiler(src, options)
-	            .pipe(plugins.if(
-                    config.autoprefix,
-                    plugins.autoprefixer(config.autoprefixerOptions)
-                ))
+            return triggerCompiler(data.src, options)
+	            .pipe(plugins.autoprefixer(options.autoprefixer))
 		        .pipe(plugins.pixrem.apply(this, options.pluginOptions.pixrem))
 		        .pipe(plugins.if(config.sourcemaps, plugins.sourcemaps.write('.')))
 		        .pipe(gulp.dest(options.output || config.cssOutput))

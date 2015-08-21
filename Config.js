@@ -10,18 +10,11 @@ var config = {
     cssOutput:    'public/css',
     jsOutput:     'public/js',
     sourcemaps:   ! util.env.production,
+    bowerDir:     'vendor/bower_components',
     autoprefix:   true,
     tasks:        [],
     collections:  [],
-    watchers:     { default: {} },
-    babelOptions: {
-        stage: 2,
-        compact: false
-    },
-    autoprefixerOptions: {
-        browsers: ['last 2 versions'],
-        cascade: false
-    }
+    watchers:     { default: {} }
 };
 
 
@@ -83,7 +76,7 @@ config.saveTask = function(key, data) {
     this.collections[key] = this.collections[key] || [];
 
     this.collections[key].push(data);
-}
+};
 
 
 module.exports = config;

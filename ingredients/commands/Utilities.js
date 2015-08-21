@@ -37,7 +37,7 @@ var prefixDirToFiles = function(dir, files) {
             file = file.substring(1);
         }
 
-        return output_dir + '/' + file.replace(dir, '');
+        return [dir, file].join('/').replace('//', '/');
     });
 };
 
