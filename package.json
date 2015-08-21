@@ -4,6 +4,8 @@
   "description": "Laravel Elixir Core",
   "main": "index.js",
   "dependencies": {
+    "babelify": "^6.1.3",
+    "browserify": "^10.2.6",
     "del": "^0.1.3",
     "gulp-autoprefixer": "^1.0.1",
     "gulp-babel": "^5.1.0",
