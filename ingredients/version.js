@@ -1,13 +1,14 @@
-var utilities = require('./commands/Utilities');
-var parsePath = require('parse-filepath');
+var gulp       = require('gulp');
+var elixir     = require('laravel-elixir');
+var utilities  = require('./commands/Utilities');
+var parsePath  = require('parse-filepath');
 var vinylPaths = require('vinyl-paths');
-var elixir = require('laravel-elixir');
-var rev = require('gulp-rev');
-var gulp = require('gulp');
-var del = require('del');
-var fs = require('fs');
+var del        = require('del');
+var rev        = require('gulp-rev');
+var fs         = require('fs');
 
-var publicDir = elixir.config.publicDir;
+var publicDir  = elixir.config.publicDir;
+
 
 /*
  |----------------------------------------------------------------
@@ -43,12 +44,20 @@ var buildTask = function(src, buildDir) {
 
     gulp.task('version', function() {
         var files = vinylPaths();
+        var manifest = buildDir + '/rev-manifest.json';
 
         utilities.logTask("Versioning", src);
 
-        // To start, we'll clear out the build directory,
-        // so that we can start from scratch.
-        del.sync(buildDir + '/*', { force: true });
+        fs.stat(manifest, function(err, stat) {
+            if (err == null) {
+                var oldManifest = JSON.parse(fs.readFileSync(manifest));
+
+                for (var key in oldManifest) {
+                    del.sync(buildDir + '/' + oldManifest[key], { force: true });
+                }
+            }
+
+        });
 
         return gulp.src(src, { base: './' + publicDir })
             .pipe(gulp.dest(buildDir))
@@ -61,7 +70,7 @@ var buildTask = function(src, buildDir) {
                 // We'll get rid of the duplicated file that
                 // usually gets put in the "build" folder,
                 // alongside the suffixed version.
-                del(files.paths);
+                del(files.paths, { force: true });
 
                 // We'll also copy over relevant sourcemap files.
                 copyMaps(src, buildDir);

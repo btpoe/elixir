@@ -1,9 +1,9 @@
-var gulp = require('gulp');
-var elixir = require('laravel-elixir');
-var compile = require('./commands/CompileCSS');
-var _ = require('underscore');
-
+var gulp         = require('gulp');
+var elixir       = require('laravel-elixir');
 var inProduction = elixir.config.production;
+var compile      = require('./commands/CompileCSS');
+var _            = require('underscore');
+
 
 /**
  * Prepare the Sass task.
@@ -19,7 +19,7 @@ var addSassTask = function(src, output, options, useRuby) {
         plugin: useRuby ? 'gulp-ruby-sass' : 'sass',
         pluginOptions: buildOptions(options, useRuby),
         src: src,
-        output: output,
+        output: output || elixir.config.cssOutput,
         search: '**/*.+(sass|scss)'
     });
 };

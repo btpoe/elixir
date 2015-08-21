@@ -1,7 +1,7 @@
-var gulp = require('gulp');
-var _ = require('underscore');
-var config = require('laravel-elixir').config;
+var gulp       = require('gulp');
+var config     = require('laravel-elixir').config;
 var inSequence = require('run-sequence');
+var _          = require('underscore');
 
 var srcPaths;
 var tasksToRun;
@@ -9,6 +9,10 @@ var tasksToRun;
 gulp.task('watch', function() {
     srcPaths = config.watchers.default;
     tasksToRun = _.intersection(config.tasks, _.keys(srcPaths).concat('copy'));
+
+    if (_.contains(tasksToRun, 'browserify')) {
+        config.watchify = true;
+    }
 
     inSequence.apply(this, tasksToRun.concat('watch-assets'));
 });

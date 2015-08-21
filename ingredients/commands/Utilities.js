@@ -1,5 +1,7 @@
-var gutil = require('gulp-util');
-var fs = require('fs');
+var fs        = require('fs');
+var gutil     = require('gulp-util');
+var parsePath = require('parse-filepath');
+var path      = require('path');
 
 /**
  * Build up the given src file(s), to be passed to Gulp.
@@ -28,6 +30,7 @@ var prefixDirToFiles = function(dir, files) {
 
     return files.map(function(file) {
         var output_dir = dir;
+        file = file.replace(new RegExp('^' + dir), '');
 
         if (file.charAt( 0 ) == '!') {
             output_dir = '!' + dir;
@@ -50,7 +53,7 @@ var logTask = function(message, files) {
 
     files = isFileList ? files : [files];
 
-    gutil.log(gutil.colors.white(message + ':', files));
+    gutil.log(gutil.colors.white(message + ':', files.join(', ')));
 
     if (isFileList) {
         assertFilesExist(files);
@@ -76,20 +79,47 @@ var logMissingFile = function(file) {
 var assertFilesExist = function(files) {
     files.forEach(function(file) {
         // We're not interested in working with
-        // paths that areregular expressions.
+        // paths that are regular expressions.
         if(/\*/.test(file)) return;
 
-        fs.exists(file, function(found) {
-            if ( ! found) {
-                logMissingFile(file);
-            }
-        });
+		file = path.normalize(file);
+		fs.open(file, 'r', function (error, fd) {
+			if (error != null) {
+				if (error.code !== 'ENOENT') throw error;
+
+				logMissingFile(file);
+
+				return;
+			}
+
+			fs.close(fd);
+		});
     });
+};
+
+
+/**
+ * Parse a given file or directory into segments.
+ *
+ * @param {string} path
+ */
+var parse = function(path) {
+    var segments = parsePath(path);
+
+    return {
+        name: segments.extname ? segments.basename : '',
+        extension: segments.extname,
+        baseDir: segments.extname ? segments.dirname : [segments.dirname, segments.basename].join('/').replace('//', '/'),
+        isDir: ! !! segments.extname,
+        path: path
+    };
+
 };
 
 
 module.exports = {
     buildGulpSrc: buildGulpSrc,
     prefixDirToFiles: prefixDirToFiles,
-    logTask: logTask
+    logTask: logTask,
+    parse: parse
 };

@@ -7,7 +7,7 @@ var merge = require('merge-stream');
 var browserSync = require('browser-sync');
 
 /**
- * Trigger Sass compilation.
+ * Trigger preprocessor compilation.
  *
  * @param {mixed}  src
  * @param {object} options
@@ -27,9 +27,7 @@ var triggerCompiler = function(src, options) {
 
         stream = rubySass.pipe(toMaps);
     } else {
-        var libSass = gulp.src(src);
-
-        stream = libSass.pipe(toMaps).pipe(compiler(pluginOptions));
+        stream = gulp.src(src).pipe(toMaps).pipe(compiler(pluginOptions));
     }
 
     return stream.on('error', function(e) {
@@ -50,15 +48,21 @@ var triggerCompiler = function(src, options) {
  */
 var buildTask = function(name, watchPath) {
     gulp.task(name, function() {
+        var dataSet = config.collections['compile'+name];
+        return merge.apply(this, dataSet.map(function(data) {
+        //return merge.apply(this, config.compile[name].map(function(data) {
+            var src = data.src;
+            var options = data.options;
 
-        return merge.apply(this, config.compile[name].map(function(compile) {
-            var src = compile.src;
-            var options = compile.options;
 
-            utilities.logTask("Running " + options.compiler, src);
+            utilities.logTask("Running " + options.compiler, data.src);
 
+            //return triggerCompiler(data.src, options)
             return triggerCompiler(src, options)
-	            .pipe(plugins.autoprefixer(options.autoprefixer))
+	            .pipe(plugins.if(
+                    config.autoprefix,
+                    plugins.autoprefixer(config.autoprefixerOptions)
+                ))
 		        .pipe(plugins.pixrem.apply(this, options.pluginOptions.pixrem))
 		        .pipe(plugins.if(config.sourcemaps, plugins.sourcemaps.write('.')))
 		        .pipe(gulp.dest(options.output || config.cssOutput))
@@ -85,11 +89,12 @@ var buildTask = function(name, watchPath) {
 module.exports = function(options) {
     var name = options.compiler.toLowerCase();
     var dir = config.assetsDir + name;
-    var src = utilities.buildGulpSrc(options.src, dir, options.search);
     var watchPath = dir + '/' + options.search;
 
-    config.compile[name] = config.compile[name] || [];
-    config.compile[name].push({ src: src, options: options });
+    config.saveTask('compile' + name, {
+        src: utilities.buildGulpSrc(options.src, dir, options.search),
+        options: options
+    });
 
     return buildTask(name, watchPath);
 };

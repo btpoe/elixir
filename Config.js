@@ -3,19 +3,25 @@ var fs = require('fs');
 var _ = require('underscore');
 
 var config = {
-    production: !! util.env.production,
-    srcDir: 'app',
-    publicDir: 'public',
-    assetsDir: 'resources/assets/',
-    cssOutput: 'public/css',
-    jsOutput: 'public/js',
-    sourcemaps: ! util.env.production,
-    bowerDir: 'vendor/bower_components',
-    tasks: [],
-    watchers: { default: {} },
-    duplicate: [],
-    concatenate: { css: [], js: [] },
-    compile: {}
+    production:   !! util.env.production,
+    srcDir:       'app',
+    publicDir:    'public',
+    assetsDir:    'resources/assets/',
+    cssOutput:    'public/css',
+    jsOutput:     'public/js',
+    sourcemaps:   ! util.env.production,
+    autoprefix:   true,
+    tasks:        [],
+    collections:  [],
+    watchers:     { default: {} },
+    babelOptions: {
+        stage: 2,
+        compact: false
+    },
+    autoprefixerOptions: {
+        browsers: ['last 2 versions'],
+        cascade: false
+    }
 };
 
 
@@ -65,6 +71,19 @@ config.setDefaultsFrom = function(file) {
         _.extend(this, defaults);
     }
 };
+
+
+/**
+ * Store a set of data in a collection.
+ *
+ * @param {string} key
+ * @param {object} data
+ */
+config.saveTask = function(key, data) {
+    this.collections[key] = this.collections[key] || [];
+
+    this.collections[key].push(data);
+}
 
 
 module.exports = config;
